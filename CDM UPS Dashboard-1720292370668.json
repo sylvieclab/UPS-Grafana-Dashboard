@@ -14,6 +14,13 @@
       "label": "Bucket",
       "value": "Power",
       "description": ""
+    },
+    {
+      "name": "VAR_COSTPERKWH",
+      "type": "constant",
+      "label": "Cost per kWh",
+      "value": "0.075516",
+      "description": ""
     }
   ],
   "__elements": {},
@@ -40,6 +47,12 @@
       "type": "panel",
       "id": "stat",
       "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "state-timeline",
+      "name": "State timeline",
       "version": ""
     },
     {
@@ -148,7 +161,7 @@
                 "RB": {
                   "color": "red",
                   "index": 5,
-                  "text": "Replace Batt"
+                  "text": "Replace Battery"
                 },
                 "TRIM": {
                   "color": "purple",
@@ -289,6 +302,12 @@
         }
       ],
       "title": "UPS Runtime Left",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ],
       "type": "stat"
     },
     {
@@ -354,6 +373,10 @@
       ],
       "title": "Driver State",
       "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
         {
           "id": "labelsToFields",
           "options": {}
@@ -799,17 +822,6 @@
       "type": "stat"
     },
     {
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 4
-      },
-      "id": 20,
-      "title": "Power Usage Statistics",
-      "type": "row"
-    },
-    {
       "datasource": {
         "type": "influxdb",
         "uid": "${DS_INFLUXDB}"
@@ -831,7 +843,7 @@
               },
               {
                 "color": "dark-green",
-                "value": 80
+                "value": 40
               }
             ]
           },
@@ -843,11 +855,11 @@
         "h": 3,
         "w": 6,
         "x": 0,
-        "y": 5
+        "y": 4
       },
       "id": 1,
       "options": {
-        "displayMode": "gradient",
+        "displayMode": "lcd",
         "maxVizHeight": 300,
         "minVizHeight": 16,
         "minVizWidth": 8,
@@ -875,7 +887,7 @@
           "refId": "A"
         }
       ],
-      "title": "Battery Charge",
+      "title": "Current Battery Charge",
       "type": "bargauge"
     },
     {
@@ -889,10 +901,10 @@
             "mode": "thresholds"
           },
           "mappings": [],
-          "max": 99,
+          "max": 100,
           "min": 0,
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "semi-dark-green",
@@ -904,7 +916,7 @@
               },
               {
                 "color": "semi-dark-red",
-                "value": 90
+                "value": 80
               }
             ]
           },
@@ -914,17 +926,18 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 3,
+        "w": 6,
         "x": 6,
-        "y": 5
+        "y": 4
       },
       "id": 9,
       "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
+        "displayMode": "lcd",
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -932,9 +945,9 @@
           "fields": "",
           "values": false
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
       "pluginVersion": "11.1.0",
       "targets": [
@@ -948,7 +961,7 @@
         }
       ],
       "title": "Load (%)",
-      "type": "stat"
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -960,105 +973,131 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
+          "custom": {
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
           },
-          "unit": "volt"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 3,
-        "x": 9,
-        "y": 5
-      },
-      "id": 2,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
+          "mappings": [
+            {
+              "options": {
+                "BOOST": {
+                  "color": "purple",
+                  "index": 7,
+                  "text": "Smart Boost"
+                },
+                "BYPASS": {
+                  "color": "blue",
+                  "index": 9,
+                  "text": "On Bypass"
+                },
+                "CAL": {
+                  "color": "purple",
+                  "index": 2,
+                  "text": "Calibration"
+                },
+                "CHRG": {
+                  "color": "purple",
+                  "index": 10,
+                  "text": "Charging"
+                },
+                "DISCHRG": {
+                  "color": "purple",
+                  "index": 11,
+                  "text": "Discharging"
+                },
+                "LB": {
+                  "color": "orange",
+                  "index": 4,
+                  "text": "Low Battery"
+                },
+                "OB": {
+                  "color": "blue",
+                  "index": 1,
+                  "text": "On Battery"
+                },
+                "OFF": {
+                  "color": "dark-red",
+                  "index": 8,
+                  "text": "Off"
+                },
+                "OL": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Online"
+                },
+                "OVER": {
+                  "color": "yellow",
+                  "index": 3,
+                  "text": "Overload"
+                },
+                "RB": {
+                  "color": "red",
+                  "index": 5,
+                  "text": "Replace Battery"
+                },
+                "TRIM": {
+                  "color": "purple",
+                  "index": 6,
+                  "text": "Smart Trim"
+                }
+              },
+              "type": "value"
+            }
           ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.1.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB}"
-          },
-          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"battery.voltage\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
-          "refId": "A"
-        }
-      ],
-      "title": "Battery Voltage",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
+          "noValue": "N/A",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "text",
+                "color": "green",
                 "value": null
               }
             ]
-          },
-          "unit": "volt"
+          }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ups.status {battery.type=\"PbAC\", device.mfr=\"Tripp Lite \", device.model=\"Tripp Lite UPS \", device.type=\"ups\", ups.mfr=\"Tripp Lite \", ups.model=\"Tripp Lite UPS \", ups.productid=\"2012\", ups.vendorid=\"09ae\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Status"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 3,
-        "w": 3,
+        "w": 9,
         "x": 12,
-        "y": 5
+        "y": 4
       },
-      "id": 3,
+      "id": 31,
       "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "pluginVersion": "11.1.0",
       "targets": [
@@ -1067,74 +1106,12 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"input.voltage\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ups.status\")\r\n  |> drop(columns: [\"host\",\"driver.version\",\"driver.version.data\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
           "refId": "A"
         }
       ],
-      "title": "Input Voltage",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "unit": "volt"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 3,
-        "x": 15,
-        "y": 5
-      },
-      "id": 4,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.1.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB}"
-          },
-          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"output.voltage\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
-          "refId": "A"
-        }
-      ],
-      "title": "Output Voltage",
-      "type": "stat"
+      "title": "UPS Status Timeline",
+      "type": "state-timeline"
     },
     {
       "datasource": {
@@ -1163,8 +1140,8 @@
       "gridPos": {
         "h": 3,
         "w": 3,
-        "x": 18,
-        "y": 5
+        "x": 21,
+        "y": 4
       },
       "id": 7,
       "options": {
@@ -1195,7 +1172,7 @@
           "refId": "A"
         }
       ],
-      "title": "Watts Used",
+      "title": "Last Watts Reading",
       "type": "stat"
     },
     {
@@ -1209,6 +1186,8 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "max": 30,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1224,41 +1203,41 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "input.voltage.nominal"
+              "options": "battery.voltage {battery.type=\"PbAC\", device.mfr=\"Tripp Lite \", device.model=\"Tripp Lite UPS \", device.type=\"ups\", driver.version=\"2.8.2\", driver.version.data=\"TrippLite HID 0.85\", host=\"270e45c8f4ce\", ups.mfr=\"Tripp Lite \", ups.model=\"Tripp Lite UPS \", ups.productid=\"2012\", ups.vendorid=\"09ae\"}"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Input"
+                "value": "Battery Voltage"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "output.voltage.nominal"
+              "options": "battery.voltage.nominal {battery.type=\"PbAC\", device.mfr=\"Tripp Lite \", device.model=\"Tripp Lite UPS \", device.type=\"ups\", driver.version=\"2.8.2\", driver.version.data=\"TrippLite HID 0.85\", host=\"270e45c8f4ce\", ups.mfr=\"Tripp Lite \", ups.model=\"Tripp Lite UPS \", ups.productid=\"2012\", ups.vendorid=\"09ae\"}"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Output"
+                "value": "Nominal Voltage"
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 3,
+        "h": 5,
         "w": 3,
-        "x": 21,
-        "y": 5
+        "x": 0,
+        "y": 7
       },
-      "id": 22,
+      "id": 2,
       "options": {
         "colorMode": "value",
-        "graphMode": "none",
+        "graphMode": "area",
         "justifyMode": "auto",
-        "orientation": "auto",
+        "orientation": "horizontal",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
@@ -1278,11 +1257,11 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "from(bucket: \"Power\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"driver.state\" or r[\"_field\"] == \"input.voltage.nominal\" or r[\"_field\"] == \"output.voltage.nominal\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"battery.voltage\" or r[\"_field\"] == \"battery.voltage.nominal\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
           "refId": "A"
         }
       ],
-      "title": "Nominal Voltages",
+      "title": "Battery Voltage",
       "type": "stat"
     },
     {
@@ -1312,7 +1291,7 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 1.5,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -1328,193 +1307,56 @@
             }
           },
           "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "semi-dark-red",
                 "value": null
               },
               {
-                "color": "red",
+                "color": "dark-green",
                 "value": 80
               }
             ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "battery.voltage"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Actual"
-              }
-            ]
           },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "battery.voltage.nominal"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Nominal"
-              }
-            ]
-          }
-        ]
+          "unit": "percent"
+        },
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 8
+        "h": 5,
+        "w": 9,
+        "x": 3,
+        "y": 7
       },
-      "id": 10,
+      "id": 5,
       "options": {
         "legend": {
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": false
         },
         "tooltip": {
           "mode": "single",
           "sort": "none"
         }
       },
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"battery.voltage\" or r[\"_field\"] == \"battery.voltage.nominal\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"battery.charge\")\r\n  |> aggregateWindow(every: 5m, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
           "refId": "A"
         }
       ],
-      "title": "Battery Voltages",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 3,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "unit": "volt"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "input.voltage"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Input Voltage"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "output.voltage"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Output Voltage"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 8
-      },
-      "id": 11,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB}"
-          },
-          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"output.voltage\" or r[\"_field\"] == \"input.voltage\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
-          "refId": "A"
-        }
-      ],
-      "title": "Non-Battery Voltages",
+      "title": "Battery Charge History",
       "type": "timeseries"
     },
     {
@@ -1581,6 +1423,10 @@
               {
                 "id": "displayName",
                 "value": "Watts"
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1.5
               }
             ]
           }
@@ -1588,9 +1434,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 8
+        "w": 9,
+        "x": 12,
+        "y": 7
       },
       "id": 8,
       "options": {
@@ -1612,7 +1458,7 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"watts\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"watts\")\r\n  |> aggregateWindow(every: 5m, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
           "refId": "A"
         }
       ],
@@ -1627,12 +1473,263 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 21,
+        "y": 7
+      },
+      "id": 32,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB}"
+          },
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"watts\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> sum(column: \"_value\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Estimated Watts Last 24h",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 21,
+        "y": 10
+      },
+      "id": 28,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB}"
+          },
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: -7d)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"watts\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> sum(column: \"_value\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Estimated  Watts Last 7d",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 150,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "semi-dark-green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "volt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "input.voltage {battery.type=\"PbAC\", device.mfr=\"Tripp Lite \", device.model=\"Tripp Lite UPS \", device.type=\"ups\", driver.version=\"2.8.2\", driver.version.data=\"TrippLite HID 0.85\", host=\"270e45c8f4ce\", ups.mfr=\"Tripp Lite \", ups.model=\"Tripp Lite UPS \", ups.productid=\"2012\", ups.vendorid=\"09ae\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Input Voltage"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "output.voltage {battery.type=\"PbAC\", device.mfr=\"Tripp Lite \", device.model=\"Tripp Lite UPS \", device.type=\"ups\", driver.version=\"2.8.2\", driver.version.data=\"TrippLite HID 0.85\", host=\"270e45c8f4ce\", ups.mfr=\"Tripp Lite \", ups.model=\"Tripp Lite UPS \", ups.productid=\"2012\", ups.vendorid=\"09ae\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Output Voltage"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "input.voltage.nominal {battery.type=\"PbAC\", device.mfr=\"Tripp Lite \", device.model=\"Tripp Lite UPS \", device.type=\"ups\", driver.version=\"2.8.2\", driver.version.data=\"TrippLite HID 0.85\", host=\"270e45c8f4ce\", ups.mfr=\"Tripp Lite \", ups.model=\"Tripp Lite UPS \", ups.productid=\"2012\", ups.vendorid=\"09ae\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Nominal Input"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "output.voltage.nominal {battery.type=\"PbAC\", device.mfr=\"Tripp Lite \", device.model=\"Tripp Lite UPS \", device.type=\"ups\", driver.version=\"2.8.2\", driver.version.data=\"TrippLite HID 0.85\", host=\"270e45c8f4ce\", ups.mfr=\"Tripp Lite \", ups.model=\"Tripp Lite UPS \", ups.productid=\"2012\", ups.vendorid=\"09ae\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Nominal Output"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 3,
+        "x": 0,
+        "y": 12
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB}"
+          },
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"input.voltage\" or r[\"_field\"] == \"output.voltage\" or r[\"_field\"] == \"input.voltage.nominal\" or r[\"_field\"] == \"output.voltage.nominal\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Voltages",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "semi-dark-red",
             "mode": "palette-classic"
           },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
+            "axisGridShow": true,
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -1646,8 +1743,11 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
             "lineWidth": 1,
-            "pointSize": 5,
+            "pointSize": 3,
             "scaleDistribution": {
               "type": "linear"
             },
@@ -1662,43 +1762,153 @@
             }
           },
           "mappings": [],
-          "max": 100,
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "semi-dark-red",
+                "color": "text",
                 "value": null
-              },
-              {
-                "color": "dark-green",
-                "value": 80
               }
             ]
           },
-          "unit": "percent"
+          "unit": "volt"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "input.voltage"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Input Voltage"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f5ae05",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1.5
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "output.voltage"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 40
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "output.voltage"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Output Voltage"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#0bfd07",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1.5
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 0,
-        "y": 16
+        "h": 9,
+        "w": 9,
+        "x": 3,
+        "y": 12
       },
-      "id": 5,
+      "id": 11,
       "options": {
         "legend": {
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
           "sort": "none"
         }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB}"
+          },
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"output.voltage\" or r[\"_field\"] == \"input.voltage\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Non-Battery Voltage History",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 21,
+        "y": 13
+      },
+      "id": 29,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
       "pluginVersion": "11.1.0",
       "targets": [
@@ -1707,12 +1917,86 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"battery.charge\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> yield(name: \"last\")",
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: -30d)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"watts\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> sum(column: \"_value\")",
           "refId": "A"
         }
       ],
-      "title": "Battery Charge",
-      "type": "timeseries"
+      "title": "Estimated  Watts Last 30d",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 21,
+        "y": 16
+      },
+      "id": 30,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB}"
+          },
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: -60d)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ups_status\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"watts\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> sum(column: \"_value\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Estimated Watts Last 60d",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ],
+      "type": "stat"
     }
   ],
   "refresh": "",
@@ -1739,17 +2023,37 @@
             "selected": false
           }
         ]
+      },
+      {
+        "hide": 2,
+        "label": "Cost per kWh",
+        "name": "costperkwh",
+        "query": "${VAR_COSTPERKWH}",
+        "skipUrlSync": false,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_COSTPERKWH}",
+          "text": "${VAR_COSTPERKWH}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_COSTPERKWH}",
+            "text": "${VAR_COSTPERKWH}",
+            "selected": false
+          }
+        ]
       }
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-3h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "CDM UPS Dashboard",
   "uid": "ddqrc5l6g5edcc",
-  "version": 11,
+  "version": 19,
   "weekStart": "monday"
 }
