@@ -1,6 +1,6 @@
 # UPS-Grafana-Dashboard
 
-![Image of the dashboard](https://github.com/sylvieclab/UPS-Grafana-Dashboard/blob/d0817126f004e498b0584d69536233e44b5c4183/UPS%20Dashboard.png?raw=true)
+![Image of the dashboard](https://raw.githubusercontent.com/sylvieclab/UPS-Grafana-Dashboard/main/UPS%20Dashboard.png?raw=true)
 
 This is an initial implementation of a Grafana dashboard to monitor the UPS in my server rack. This utilizes the following containers:
 - Network Utility Tools (NUT)
